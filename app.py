@@ -30,7 +30,7 @@ st.markdown(page_bg_img, unsafe_allow_html=True)
 st.sidebar.title("🎓 Навігація")
 page = st.sidebar.radio(
     "Оберіть розділ:",
-    ["🏠 Титульна сторінка", "🧮 Калькулятор", "🔁 Конвертер", "📉 Побудова графіка", "📅 Календар ДЗ"]
+    ["🏠 Титульна сторінка", "🧮 Калькулятор", "🔁 Конвертер", "📉 Побудова графіка", "📅 Календар ДЗ", "➗ НСД, НСК та СА", "📚 Таблиця сталих"]
 )
 
 # --- 1. ТИТУЛЬНА СТОРІНКА ---
@@ -195,3 +195,151 @@ elif page == "📅 Календар ДЗ":
             st.info("Немає ДЗ на цю дату.")
     else:
         st.info("Поки нічого не додано.")
+
+# --- 5. НСД, НСК та СА ---
+elif page == "➗ НСД, НСК та СА":
+    st.header("➗ НСД, НСК та Середнє арифметичне")
+    conversion_type = st.selectbox("Що хочеш знайти?", ["НСД", "НСК", "Середнє арифметичне"])
+    if conversion_type=="НСД":
+        if "nsd_values" not in st.session_state:
+            st.session_state.nsd_values = [1.0, 1.0]
+
+        st.subheader("Введіть числа для НСД:")
+
+        for i, val in enumerate(st.session_state.nsd_values):
+            st.session_state.nsd_values[i] = st.number_input(
+                f"Число {i+1}:",
+                value=val,
+                min_value=1.0,
+                step=1.0,
+                key=f"nsd_input_{i}"
+            )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("➕ Додати число"):
+                st.session_state.nsd_values.append(1.0)
+                st.rerun()
+
+        with col2:
+            if len(st.session_state.nsd_values) > 2:
+                if st.button("➖ Видалити останнє"):
+                    st.session_state.nsd_values.pop()
+                    st.rerun()
+
+        if st.button("Обчислити НСД"):
+            def gcd_multiple(numbers):
+                """
+                Обчислює НСД для списку чисел
+                """
+                resulter = int(numbers[0])
+                for l in range(1, len(numbers)):
+                    resulter = math.gcd(resulter, int(numbers[l]))
+                return resulter
+
+            try:
+                result = gcd_multiple(st.session_state.nsd_values)
+                st.success(f"НСД чисел {[int(x) for x in st.session_state.nsd_values]} = {result}")
+            except Exception as e:
+                st.error(f"Помилка обчислення. Перевірте введені значення. {e}")
+
+    elif conversion_type=="НСК":
+        if "lcm_values" not in st.session_state:
+            st.session_state.lcm_values = [1.0, 1.0]
+
+        st.subheader("Введіть числа для НСК:")
+
+        for i, val in enumerate(st.session_state.lcm_values):
+            st.session_state.lcm_values[i] = st.number_input(
+                f"Число {i+1}:",
+                value=val,
+                min_value=1.0,
+                step=1.0,
+                key=f"lcm_input_{i}"
+            )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("➕ Додати число"):
+                st.session_state.lcm_values.append(1.0)
+                st.rerun()
+
+        with col2:
+            if len(st.session_state.lcm_values) > 2:
+                if st.button("➖ Видалити останнє"):
+                    st.session_state.lcm_values.pop()
+                    st.rerun()
+
+        if st.button("Обчислити НСК"):
+            def lcm_multiple(numbers):
+                """
+                Обчислює НСК для списку чисел
+                """
+                resulter = int(numbers[0])
+                for l in range(1, len(numbers)):
+                    resulter = math.lcm(resulter, int(numbers[l]))
+                return resulter
+
+            try:
+                result = lcm_multiple(st.session_state.lcm_values)
+                st.success(f"НСК чисел {[int(x) for x in st.session_state.lcm_values]} = {result}")
+            except Exception as e:
+                st.error(f"Помилка обчислення. Перевірте введені значення. {e}")
+    elif conversion_type=="Середнє арифметичне":
+        if "average_values" not in st.session_state:
+            st.session_state.average_values = [1.0, 1.0]
+
+        st.subheader("Введіть числа для середнього арифметичного:")
+
+        # Відображаємо всі поля введення
+        for i, val in enumerate(st.session_state.average_values):
+            st.session_state.average_values[i] = st.number_input(
+                f"Число {i+1}:",
+                value=val,
+                min_value=1.0,
+                step=1.0,
+                key=f"average_input_{i}"
+            )
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("➕ Додати число"):
+                st.session_state.average_values.append(1.0)
+                st.rerun()
+
+        with col2:
+            if len(st.session_state.average_values) > 2:
+                if st.button("➖ Видалити останнє"):
+                    st.session_state.average_values.pop()
+                    st.rerun()
+
+        if st.button("Обчислити середнє арифметичне"):
+            def average_multiple(numbers):
+                """
+                Обчислює середнє арифметичне для списку чисел
+                """
+                return sum(numbers) / len(numbers)
+
+            try:
+                result = average_multiple(st.session_state.average_values)
+                st.success(f"Середнє арифметичне чисел {[int(x) for x in st.session_state.average_values]} = {result}")
+            except Exception as e:
+                st.error(f"Помилка обчислення. Перевірте введені значення. {e}")
+
+elif page == "📚 Таблиця сталих":
+    st.title("📚 Фізичні та математичні сталі")
+
+    constants_data = [
+        {"Назва": "Швидкість світла у вакуумі", "Позначення": "c", "Значення": "299 792 458", "Одиниці": "м/с"},
+        {"Назва": "Гравітаційна стала", "Позначення": "G", "Значення": "6.67430 × 10⁻¹¹", "Одиниці": "м³/кг·с²"},
+        {"Назва": "Заряд електрона", "Позначення": "e", "Значення": "1.602176634 × 10⁻¹⁹", "Одиниці": "Кл"},
+        {"Назва": "Постійна Планка", "Позначення": "h", "Значення": "6.62607015 × 10⁻³⁴", "Одиниці": "Дж·с"},
+        {"Назва": "Маса електрона", "Позначення": "me", "Значення": "9.10938356 × 10⁻³¹", "Одиниці": "кг"},
+        {"Назва": "Маса протона", "Позначення": "mp", "Значення": "1.6726219 × 10⁻²⁷", "Одиниці": "кг"},
+        {"Назва": "Постійна Авогадро", "Позначення": "NA", "Значення": "6.02214076 × 10²³", "Одиниці": "1/моль"},
+        {"Назва": "Газова стала", "Позначення": "R", "Значення": "8.314", "Одиниці": "Дж/моль·К"},
+        {"Назва": "Пі (відношення кола до діаметра)", "Позначення": "π", "Значення": "3.1415926535", "Одиниці": "—"},
+        {"Назва": "Ейлерова стала", "Позначення": "e", "Значення": "2.7182818284", "Одиниці": "—"},
+    ]
+
+    st.dataframe(constants_data, use_container_width=True)
