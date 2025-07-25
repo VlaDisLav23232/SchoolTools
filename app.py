@@ -1,4 +1,7 @@
 import streamlit as st
+import numpy as np
+import matplotlib.pyplot as plt
+import math
 
 st.set_page_config(
     page_title="Шкільний помічник",
@@ -9,7 +12,7 @@ st.set_page_config(
 st.sidebar.title("🎓 Навігація")
 page = st.sidebar.radio(
     "Оберіть розділ:",
-    ["🏠 Титульна сторінка", "🧮 Калькулятор", "🔁 Конвертер"]
+    ["🏠 Титульна сторінка", "🧮 Калькулятор", "🔁 Конвертер", "📉 Побудова графіка"]
 )
 
 # --- 1. ТИТУЛЬНА СТОРІНКА ---
@@ -87,3 +90,41 @@ elif page == "🔁 Конвертер":
         to_prefix = st.selectbox("Куди:", prefixes.keys(), key="prefix_to")
         result = value * prefixes[from_prefix] / prefixes[to_prefix]
         st.success(f"{value} {from_prefix} = {result} {to_prefix}")
+
+# --- 4. ГРАФІК ФУНКЦІЇ ---
+elif page == "📉 Побудова графіка":
+    st.header("📉 Побудова математичної функції")
+
+    st.markdown("""
+    ✍️ Введи функцію, яку хочеш побудувати. Наприклад: `x**2`, `sin(x) + x`, `exp(-x**2)`
+    """)
+
+    func_input = st.text_input("Функція f(x):", "sin(x)")
+    x_min = st.number_input("Мінімальне значення x", value=-10.0)
+    x_max = st.number_input("Максимальне значення x", value=10.0)
+
+    x = np.linspace(x_min, x_max, 500)
+
+    try:
+        y = [eval(func_input, {
+            "x": val,
+            "sin": math.sin,
+            "cos": math.cos,
+            "tan": math.tan,
+            "exp": math.exp,
+            "log": math.log,
+            "sqrt": math.sqrt,
+            "__builtins__": {}
+        }) for val in x]
+
+        fig, ax = plt.subplots()
+        ax.plot(x, y, label=f"f(x) = {func_input}", color="blue")
+        ax.set_xlabel("x")
+        ax.set_ylabel("f(x)")
+        ax.set_title("Графік функції")
+        ax.grid(True)
+        ax.legend()
+        st.pyplot(fig)
+
+    except Exception as e:
+        st.error(f"❌ Помилка у формулі: {e}")
