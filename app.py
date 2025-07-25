@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import datetime
 
 st.set_page_config(
     page_title="Шкільний помічник",
@@ -12,7 +13,7 @@ st.set_page_config(
 st.sidebar.title("🎓 Навігація")
 page = st.sidebar.radio(
     "Оберіть розділ:",
-    ["🏠 Титульна сторінка", "🧮 Калькулятор", "🔁 Конвертер", "📉 Побудова графіка"]
+    ["🏠 Титульна сторінка", "🧮 Калькулятор", "🔁 Конвертер", "📉 Побудова графіка", "📅 Календар ДЗ"]
 )
 
 # --- 1. ТИТУЛЬНА СТОРІНКА ---
@@ -128,3 +129,48 @@ elif page == "📉 Побудова графіка":
 
     except Exception as e:
         st.error(f"❌ Помилка у формулі: {e}")
+
+
+# 📅 КАЛЕНДАР З ДЗ
+if "calendar_hw" not in st.session_state:
+    st.session_state.calendar_hw = []
+elif page == "📅 Календар ДЗ":
+    st.title("📅 Календар домашніх завдань")
+
+    # Додавання нового ДЗ
+    st.subheader("➕ Додати ДЗ до календаря")
+    with st.form("add_hw_calendar_form"):
+        subject = st.text_input("Предмет")
+        hw_date = st.date_input("Дата виконання", min_value=datetime.date.today())
+        description = st.text_area("Опис домашнього завдання")
+        submitted = st.form_submit_button("Додати")
+
+        if submitted and subject:
+            st.session_state.calendar_hw.append({
+                "Предмет": subject,
+                "Дата": hw_date,
+                "Опис": description,
+                "✅ Виконано": False
+            })
+            st.success("✅ ДЗ додано!")
+
+    # Перегляд ДЗ у календарі
+    st.subheader("📖 Завдання за датами")
+    if st.session_state.calendar_hw:
+        selected_date = st.date_input("Оберіть дату для перегляду")
+        filtered = [task for task in st.session_state.calendar_hw if task["Дата"] == selected_date]
+
+        if filtered:
+            for i, task in enumerate(filtered):
+                cols = st.columns([3, 4, 2, 1])
+                cols[0].markdown(f"**{task['Предмет']}**")
+                cols[1].markdown(task["Опис"])
+                done = cols[2].checkbox("Готово", value=task["✅ Виконано"], key=f"cal_done_{i}")
+                if cols[3].button("❌", key=f"del_{i}"):
+                    st.session_state.calendar_hw.remove(task)
+                    st.experimental_rerun()
+                task["✅ Виконано"] = done
+        else:
+            st.info("Немає ДЗ на цю дату.")
+    else:
+        st.info("Поки нічого не додано.")
