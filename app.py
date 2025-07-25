@@ -1,14 +1,31 @@
 import streamlit as st
-import numpy as np
 import matplotlib.pyplot as plt
+
+import numpy as np
 import math
 import datetime
+
 
 st.set_page_config(
     page_title="Шкільний помічник",
     page_icon="🎓",
     layout="centered"
 )
+
+page_bg_img = """
+<style>
+[data-testid="stAppViewContainer"] > div:first-child {
+    background-image: url("https://i.imgur.com/BJc5ZJ3.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+</style>
+"""
+
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 
 st.sidebar.title("🎓 Навігація")
 page = st.sidebar.radio(
@@ -29,6 +46,10 @@ if page == "🏠 Титульна сторінка":
     
     Оберіть розділ у бічній панелі, щоб почати.
     """)
+
+    st.markdown("### 🆕 Що нового:")
+    st.success("✅ Додано - 📅 Календар ДЗ")
+    st.warning("⚠️ Незабаром — генерація тестів на основі завдань")
 
 # --- 2. КАЛЬКУЛЯТОР ---
 elif page == "🧮 Калькулятор":
@@ -168,7 +189,7 @@ elif page == "📅 Календар ДЗ":
                 done = cols[2].checkbox("Готово", value=task["✅ Виконано"], key=f"cal_done_{i}")
                 if cols[3].button("❌", key=f"del_{i}"):
                     st.session_state.calendar_hw.remove(task)
-                    st.experimental_rerun()
+                    st.rerun()
                 task["✅ Виконано"] = done
         else:
             st.info("Немає ДЗ на цю дату.")
