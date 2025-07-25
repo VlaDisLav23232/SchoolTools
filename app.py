@@ -12,19 +12,6 @@ st.set_page_config(
     layout="centered"
 )
 
-page_bg_img = """
-<style>
-[data-testid="stAppViewContainer"] > div:first-child {
-    background-image: url("https://i.imgur.com/BJc5ZJ3.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-</style>
-"""
-
-st.markdown(page_bg_img, unsafe_allow_html=True)
 
 
 st.sidebar.title("🎓 Навігація")
